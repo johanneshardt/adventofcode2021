@@ -3,7 +3,7 @@ package day02
 import readInput
 
 fun main() {
-    
+
     fun parse(input: List<String>): List<Pair<String, Int>> {
         return input.map { it.split(" ") }.map { Pair(it[0], it[1].toInt()) }
     }
@@ -71,7 +71,7 @@ fun main() {
 
 interface Submarine {
     var horizontal: Int
-    val vertical: Int
+    var vertical: Int
 
     fun forward(arg: Int)
     fun up(arg: Int)
