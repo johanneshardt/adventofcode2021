@@ -6,11 +6,9 @@ fun main() {
     fun simulateCourse(input: List<String>, s: Submarine): Int {
         input.map {
             it.split(" ")
-        }.map {
-            Pair(it[0], it[1])
         }.forEach {
-            val arg = it.second.toInt()
-            when (it.first) {
+            val arg = it[1].toInt()
+            when (it[0]) {
                 "forward" -> s.forward(arg)
                 "up" -> s.up(arg)
                 "down" -> s.down(arg)
