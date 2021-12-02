@@ -3,21 +3,23 @@ package day02
 import readInput
 
 fun main() {
-    fun simulateCourse(input: List<String>, s: Submarine): Int {
-        input.map {
-            it.split(" ")
-        }.forEach {
-            val arg = it[1].toInt()
-            when (it[0]) {
-                "forward" -> s.forward(arg)
-                "up" -> s.up(arg)
-                "down" -> s.down(arg)
+    
+    fun parse(input: List<String>): List<Pair<String, Int>> {
+        return input.map { it.split(" ") }.map { Pair(it[0], it[1].toInt()) }
+    }
+
+    fun simulateCourse(input: List<Pair<String, Int>>, s: Submarine): Int {
+        input.forEach {
+            when (it.first) {
+                "forward" -> s.forward(it.second)
+                "up" -> s.up(it.second)
+                "down" -> s.down(it.second)
             }
         }
         return s.distance()
     }
 
-    fun part1(input: List<String>): Int {
+    fun part1(input: List<Pair<String, Int>>): Int {
         data class Sub1(
             override var horizontal: Int = 0,
             override var vertical: Int = 0
@@ -37,10 +39,11 @@ fun main() {
         return simulateCourse(input, Sub1())
     }
 
-    fun part2(input: List<String>): Int {
+    fun part2(input: List<Pair<String, Int>>): Int {
         data class Sub2(
             override var horizontal: Int = 0,
-            override var vertical: Int = 0, var aim: Int = 0
+            override var vertical: Int = 0,
+            var aim: Int = 0
         ) : Submarine {
             override fun forward(arg: Int) {
                 horizontal += arg
@@ -58,11 +61,10 @@ fun main() {
         return simulateCourse(input, Sub2())
     }
 
-
-    val testInput = readInput("day02/test")
+    val testInput = parse(readInput("day02/test"))
     check(part1(testInput) == 150)
 
-    val input = readInput("day02/input")
+    val input = parse(readInput("day02/input"))
     println(part1(input))
     println(part2(input))
 }
