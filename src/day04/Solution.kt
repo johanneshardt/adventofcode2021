@@ -4,30 +4,23 @@ import readInput
 
 fun main() {
 
-    // Maybe refactor
     fun parse(input: List<String>, dimension: Int): Game {
         val numberDraw = input.first().split(",").map { it.toInt() }
-        val boards = mutableListOf<Board>()
-        val currentBoard = mutableSetOf<Square>()
-        var currentRow = 0
-        for (line in input.drop(1)) {
-            if (line.isBlank()) {
-                if (currentRow >= dimension) {
-                    // Convert to immutable set
-                    boards.add(Board(currentBoard.toSet()))
-                    currentBoard.clear()
-                }
-                currentRow = 0
-            } else {
-                line.trim().split("\\s+".toRegex()).map { it.toInt() }.forEachIndexed { col, element ->
-                    currentBoard.add(Square(element, currentRow, col))
-                }
-                currentRow += 1
+        val boards = input.drop(1)
+            .filterNot { it.isBlank() }
+            .chunked(dimension)
+            .map { board ->
+                Board(board.flatMapIndexed { row, line ->
+                    line.trim()
+                        .split("\\s+".toRegex())
+                        .map { it.toInt() }
+                        .mapIndexed { col, element ->
+                            Square(element, row, col)
+                        }
+                }.toSet())
             }
-        }
-        // If there is no blank line after the last board
-        boards.add(Board(currentBoard.toSet()))
-        return Game(numberDraw, boards.toList())
+
+        return Game(numberDraw, boards)
     }
 
     fun part1(g: Game): Int {
