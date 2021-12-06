@@ -23,12 +23,9 @@ fun main() {
         input.forEach { fishCount[it.age] = it.count.toLong() }
         repeat(days) {
             val newFish = fishCount.first()
-            fishCount.indices.drop(1).forEach {
-                fishCount[it - 1] = fishCount[it]
-                fishCount[it] = 0
-            }
+            fishCount.removeAt(0)
             fishCount[6] += newFish
-            fishCount[8] += newFish
+            fishCount.add(newFish)
         }
         return fishCount.sum()
     }
