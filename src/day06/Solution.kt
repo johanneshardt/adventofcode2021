@@ -6,15 +6,13 @@ fun main() {
 
     fun parse(input: List<String>): Set<FishState> {
         return input
-            .flatMap { line ->
-                line
-                    .trim()
-                    .split(",")
-                    .map { it.toInt() }
-                    .groupingBy { it }
-                    .eachCount()
-                    .map { FishState(age = it.key, count = it.value) }
-            }
+            .first()
+            .trim()
+            .split(",")
+            .map { it.toInt() }
+            .groupingBy { it }
+            .eachCount()
+            .map { FishState(age = it.key, count = it.value) }
             .toSet()
     }
 
@@ -48,5 +46,3 @@ fun main() {
 }
 
 data class FishState(val age: Int, val count: Int)
-
-
