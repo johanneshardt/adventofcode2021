@@ -7,22 +7,21 @@ fun main() {
     fun parse(input: List<String>): List<Pair<Patterns, Patterns>> {
         return input.map { line ->
             val l = line.trim().split(" | ").map { patterns ->
-                patterns.split(" ").map { Pattern(it) }
+                patterns.split(" ").map { p -> Pattern(p.map { it }.toSet()) }
             }.map {
                 Patterns(it)
             }
-
             Pair(l[0], l[1])
         }
     }
 
 
-    fun mapToDigits(numbers: Patterns): Map<Set<Char>, Int> {
+    fun mapToDigits(numbers: Patterns): Map<Pattern, Int> {
         val mapping = mutableMapOf<Int, Pattern>()
         val patterns = numbers.patterns.toMutableSet()
         val signalStrings = mutableMapOf<String, Set<Char>>()
         setOf(2, 4, 3, 7).map { len ->
-            val match = patterns.first { it.wires.size == len }
+            val match = patterns.first { it.signal.size == len }
             patterns -= match   // TODO change this somehow
             len to match
         }.forEach {
@@ -36,22 +35,22 @@ fun main() {
         }
 
         // Since the input structure is guaranteed, I used !! liberally in this function
-        signalStrings += "a" to (mapping[7]!!.wires subtract mapping[1]!!.wires)
-        signalStrings += "bd" to (mapping[4]!!.wires subtract mapping[1]!!.wires)
-        signalStrings += "aeg" to (mapping[8]!!.wires subtract mapping[4]!!.wires)
+        signalStrings += "a" to (mapping[7]!!.signal subtract mapping[1]!!.signal)
+        signalStrings += "bd" to (mapping[4]!!.signal subtract mapping[1]!!.signal)
+        signalStrings += "aeg" to (mapping[8]!!.signal subtract mapping[4]!!.signal)
         signalStrings += "eg" to (signalStrings["aeg"]!! subtract signalStrings["a"]!!)
 
 
         for (p in patterns) {
-            when (p.wires.size) {
+            when (p.signal.size) {
                 // 0, 6, 9
                 6 -> {
                     mapping += if (
-                        (p.wires subtract signalStrings["a"]!! subtract mapping[4]!!.wires) != signalStrings["eg"]!!) {
+                        (p.signal subtract signalStrings["a"]!! subtract mapping[4]!!.signal) != signalStrings["eg"]!!) {
                         9 to p
-                    } else if ((p.wires subtract mapping[1]!!.wires).size == 5) {
+                    } else if ((p.signal subtract mapping[1]!!.signal).size == 5) {
                         6 to p
-                    } else if ((p.wires subtract mapping[1]!!.wires).size == 4) {
+                    } else if ((p.signal subtract mapping[1]!!.signal).size == 4) {
                         0 to p
                     } else {
                         throw IllegalStateException("Invalid input")
@@ -59,11 +58,11 @@ fun main() {
                 }
                 // 2, 3, 5
                 5 -> {
-                    mapping += if ((p.wires subtract mapping[4]!!.wires).size == 3) {
+                    mapping += if ((p.signal subtract mapping[4]!!.signal).size == 3) {
                         2 to p
-                    } else if ((p.wires subtract mapping[7]!!.wires).size == 2) {
+                    } else if ((p.signal subtract mapping[7]!!.signal).size == 2) {
                         3 to p
-                    } else if ((p.wires subtract signalStrings["bd"]!!).size == 3) {
+                    } else if ((p.signal subtract signalStrings["bd"]!!).size == 3) {
                         5 to p
                     } else {
                         throw IllegalStateException("Invalid input")
@@ -74,12 +73,12 @@ fun main() {
             }
         }
 
-        return mapping.entries.associate { (num, pattern) -> pattern.wires to num }
+        return mapping.entries.associate { (num, pattern) -> pattern to num }
     }
 
     fun part1(input: List<Pair<Patterns, Patterns>>): Int {
         return input.sumOf { line ->
-            line.second.patterns.map { it.wires.size }.count { it in setOf(2, 4, 3, 7) }
+            line.second.patterns.map { it.signal.size }.count { it in setOf(2, 4, 3, 7) }
         }
     }
 
@@ -88,7 +87,7 @@ fun main() {
             val mapping = mapToDigits(line.first)
             val output = line.second.patterns
             val mapped = output.map { pattern ->
-                mapping[pattern.wires]
+                mapping[pattern]
             }
             mapped.joinToString("").toInt()
         }
@@ -105,8 +104,6 @@ fun main() {
     println(part2(input))
 }
 
-data class Pattern(val signal: String) {
-    val wires = signal.map { it }.toSet()
-}
+data class Pattern(val signal: Set<Char>)
 
 data class Patterns(val patterns: List<Pattern>)
