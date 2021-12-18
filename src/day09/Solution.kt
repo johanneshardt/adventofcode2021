@@ -99,6 +99,7 @@ data class Heatmap(val matrix: List<List<Int>>) {
 }
 
 data class Point(val x: Int, val y: Int) {
+    // Allows method chaining
     fun step(d: Direction): Point {
         return when (d) {
             Direction.NORTH -> this.copy(y = (y - 1))
